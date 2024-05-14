@@ -1,7 +1,21 @@
-# Novaya Kompaniya [NK] Store aka Пельменная №2
-## [NK-Dumplings](https://nk-dumplings.ru)
 
-<img width="900" alt="image" src="https://storage.yandexcloud.net/nk-dumpling-bucket/monitoring/Homepage.png">
+# Novaya Kompaniya [NK] Store aka Пельменная №2
+
+Итоговый проект курса «DevOps для эксплуатации и разработки» от Яндекс.Практикум.
+Нижеописанное по сути является пояснительной запиской и чек-листом для проверяющего. Ссылки актуальны на момент сдачи проекта (07.2023)
+
+<img width="900" alt="image" src="https://private-user-images.githubusercontent.com/110383560/330426215-8a88e4f4-9c7f-4687-97f7-d11b6424d4b4.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MTU2OTAxODYsIm5iZiI6MTcxNTY4OTg4NiwicGF0aCI6Ii8xMTAzODM1NjAvMzMwNDI2MjE1LThhODhlNGY0LTljN2YtNDY4Ny05N2Y3LWQxMWI2NDI0ZDRiNC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNTE0JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDUxNFQxMjMxMjZaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yZjA3ODkzZmYxMDkxYzFkNThkZjFjYzM3ZWQ4MGNiMzNjNjgzMmQyODI3M2NiYWQ4NTg5MWUyNzRlODg5YjgwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.--7oOAepwc_konpv0-TRDNWQu7ehV-ji4wUdxCsNDLI">
+
+## Technologies used
+* Frontend – Javascript, Vue.
+* Backend  – Go
+* Platform resources - Terraform
+* Deploy and expose - K8S, [Yandex Managed Service for Kubernetes](https://cloud.yandex.ru/services/managed-kubernetes)
+* Artifact storage - [Nexus](https://nexus.k8s.praktikum-services.tech/repository/eremenko-grigorii-dumplings-store-helm/), [Gitlab Container Registry](https://gitlab.praktikum-services.ru/std-014-19/nk-dumplings/container_registry), [Yandex S3]((https://cloud.yandex.ru/services/storage/))
+* CI\CD - [Gitlab](https://gitlab.praktikum-services.ru/std-014-19/nk-dumplings)
+* SAST - Gitlab, Sonarqube ([Frontend](https://sonarqube.praktikum-services.ru/dashboard?id=14_GRIGORIIEREMENKO__DUMPLINGS_FRONTEND), [Backend](https://sonarqube.praktikum-services.ru/dashboard?id=14_GRIGORIIEREMENKO__DUMPLINGS_BACKEND))
+* Container - Docker
+* Monitoring -  [Prometheus](https://prometheus.nk-dumplings.ru/), [Grafana](https://grafana.nk-dumplings.ru/), Loki
 
 ## Frontend
 
@@ -33,18 +47,6 @@ go test -v ./...
 - патч-версии изменяются автоматически на основе переменной `CI_PIPELINE_ID`
 - для инфраструктуры версия приложения изменяется вручную в чарте `infrastructure/helm/Chart.yaml`
 - есть возможность выкатить конкретные версии фронта и бэка передав параметры $FRONTEND_VERSION и $BACKEND_VERSION. В ином случае деплоится latest.
-
-## Infrastructure
-
-- код ---> [Gitlab](https://gitlab.praktikum-services.ru/std-014-19/nk-dumplings)
-- helm-charts ---> [Nexus](https://nexus.k8s.praktikum-services.tech/repository/eremenko-grigorii-dumplings-store-helm/)
-- анализ кода:
-[SonarQube_Frontend](https://sonarqube.praktikum-services.ru/dashboard?id=14_GRIGORIIEREMENKO__DUMPLINGS_FRONTEND)
-[SonarQube_Backend](https://sonarqube.praktikum-services.ru/dashboard?id=14_GRIGORIIEREMENKO__DUMPLINGS_BACKEND)
-- docker-images ---> [Gitlab Container Registry](https://gitlab.praktikum-services.ru/std-014-19/nk-dumplings/container_registry)
-- Статические объекты хранятся в Yandex S3 ---> [nk-dumpling-bucket/nk-pics](https://cloud.yandex.ru/services/storage/)
-- Состояние terraform хранится в Yandex S3 ---> [nk-dumpling-bucket](https://cloud.yandex.ru/services/storage/)
-- Managed K8S ---> [Yandex Managed Service for Kubernetes](https://cloud.yandex.ru/services/managed-kubernetes)
 
 ## Инициализация инфраструктуры k8s
 
@@ -81,31 +83,10 @@ kubectl get svc
 # секрет, содержащий сертификат и закрытый ключ должен иметь имя k8s-secret
 ```
 
-## [Monitoring](https://grafana.nk-dumplings.ru/)
+## Monitoring
 
-Креды:
-#Креды по умолчанию хранятся в секрете {{ .ReleaseName }}-grafana
-#Значения по умолчанию можно изменить передав ключи при установке helm-chart'a
-admin | prom-operator
-
-- [frontend](https://grafana.nk-dumplings.ru/d/9bSijBjVz/1_nginx-frontend?orgId=1)
-
-<img width="500" alt="image" src="https://storage.yandexcloud.net/nk-dumpling-bucket/monitoring/frontend.png">
-
-- [backend](https://grafana.nk-dumplings.ru/d/wqSuCfjVz/1_nginx-backend?orgId=1)
-
-<img width="500" alt="image" src="https://storage.yandexcloud.net/nk-dumpling-bucket/monitoring/backend.png">
-
-- [logs](https://grafana.nk-dumplings.ru/d/sadlil-loki-apps-dashboard/logs-app?orgId=1&var-app=nk%2Fnk-backend&var-search=)
-
-<img width="500" alt="image" src="https://storage.yandexcloud.net/nk-dumpling-bucket/monitoring/promtail.png">
-
-- [infrastructure](https://grafana.nk-dumplings.ru/d/garysdevil-kube-state-metrics-v2/kube-state-metrics-v2?orgId=1)
-
-<img width="500" alt="image" src="https://storage.yandexcloud.net/nk-dumpling-bucket/monitoring/kube-state.png">
-
-- [go_metrics](https://grafana.nk-dumplings.ru/d/CgCw8jKZz/go-metrics?orgId=1&refresh=5s)
-<img width="500" alt="image" src="https://storage.yandexcloud.net/nk-dumpling-bucket/monitoring/go-metrics.png">
+Креды по умолчанию (admin | prom-operator) хранятся в секрете {{ .ReleaseName }}-grafana
+Значения по умолчанию можно изменить передав ключи при установке helm-chart'a
 
 
 ## [Чек-лист для проверки]
@@ -121,7 +102,7 @@ admin | prom-operator
 | Фронтенд: HTML-страница раздаётся с Nginx | Выполнено  |
 | В GitLab CI описан шаг сборки и публикации артефактов | Выполнено  |
 | В GitLab CI описан шаг тестирования   |  Выполнено |
-|  В GitLab CI описан шаг деплоя |  Выполнено | Поддерживается деплой на тестовую ВМ, но её "как-бы" нет. В проде деплоим сразу в k8s
+|  В GitLab CI описан шаг деплоя |  Выполнено | Поддерживается деплой на тестовую ВМ. В проде деплоим сразу в k8s
 | Развёрнут Kubernetes-кластер в облаке  |  Выполнено |
 |  Kubernetes-кластер описан в виде кода, и код хранится в репозитории GitLab | Выполнено  |
 |  Конфигурация всех необходимых ресурсов описана согласно IaC  |  Выполнено | 
