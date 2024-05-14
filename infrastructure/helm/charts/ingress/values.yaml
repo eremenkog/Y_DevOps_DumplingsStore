@@ -1,0 +1,16 @@
+ingress:
+  pathType: Prefix
+  portNumber: 80
+
+frontend:
+  name: frontend
+
+grafana:
+  hostname: grafana.nk-dumplings.ru
+  name: grafana
+  portNumber: 80
+
+loki:
+  hostname: loki.nk-dumplings.ru
+  name: loki
+  portNumber: 3100

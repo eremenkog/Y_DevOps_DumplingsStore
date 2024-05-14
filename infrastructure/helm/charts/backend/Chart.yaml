@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: latest
+description: Backend chart for dumplings store.
+name: backend
+type: application
+version: 0.1.0
+

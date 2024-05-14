@@ -1,0 +1,48 @@
+name: backend
+app: backend
+registryUrl: "gitlab.praktikum-services.ru:5050/std-014-19/nk-dumplings"
+#service.yaml
+service:
+  ports:
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+selector:
+  app: backend
+#deployment.yaml
+revisionHistoryLimit: 15
+replicas: 2
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 20%
+imageDir:  "/dumplings-store-backend"
+ports:
+  containerPort: 8081
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8081
+  initialDelaySeconds: 20
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 6
+#vpa.yaml
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+updatePolicy:
+  updateMode: Initial
+resourcePolicy:
+  containerName: "*"
+  minAllowed:
+    cpu: 0m
+    memory: 0Mi
+  maxAllowed:
+     cpu: 1
+     memory: 500Mi
+  controlledResources:
+    cpu: "cpu"
+    memory: "memory"
+  controlledValues: RequestsAndLimits
+

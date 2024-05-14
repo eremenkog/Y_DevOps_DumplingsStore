@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: latest
+description: Frontend chart for dumplings store.
+name: frontend
+type: application
+version: 0.1.0
+

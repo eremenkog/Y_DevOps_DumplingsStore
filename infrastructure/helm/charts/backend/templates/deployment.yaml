@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.name }}
+  labels:
+    app: {{ .Release.Name }}-{{ .Values.app }}
+spec:
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+    rollingUpdate:
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ .Values.app }}
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8081"
+        prometheus.io/scrape: "true"
+      labels:
+        app: {{ .Release.Name }}-{{ .Values.app }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-{{ .Values.name }}
+          image: {{ .Values.registryUrl }}{{ .Values.imageDir }}:{{ default "latest" .Values.image.tag }}
+          imagePullPolicy: {{ .Values.global.pullPolicy }}
+          ports:
+            - name: {{ .Values.name }}
+              containerPort: {{ .Values.ports.containerPort }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.httpGet.path }}
+              port: {{ .Values.livenessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+      imagePullSecrets:
+        - name: {{ .Values.global.imagePullSecrets.name }}
+

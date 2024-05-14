@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  nginx.conf: |
+    server {
+
+      listen       {{ default 80 .Values.containerPort }};
+
+      location / {
+        root   /usr/share/nginx/html;
+        index  index.html;
+        try_files $uri $uri/ /index.html;
+      }
+
+      error_page   500 502 503 504  /50x.html;
+      location = /50x.html {
+        root   /usr/share/nginx/html;
+      }
+
+      location ~ ^/(categories|products|auth|metrics|orders)/ {
+        proxy_pass http://{{ .Release.Name }}-{{ default "backend" .Values.global.backend.name }}:{{ default 8081 .Values.global.backend.port }};
+      }
+
+      location /stub_status {
+        allow 127.0.0.1;
+        deny all;
+        stub_status on;
+      }
+    }
+

@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.name }}
+  labels:
+    app: {{ .Release.Name }}-{{ .Values.app }}
+spec:
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ .Values.app }}
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9113"
+        prometheus.io/scrape: "true"
+      labels:
+        app: {{ .Release.Name }}-{{ .Values.app }}
+    spec:
+      nodeSelector:
+        app: {{ .Values.app }}
+      containers:
+        - name: {{ .Values.name }}
+          image: {{ .Values.registryUrl }}{{ .Values.imageDir }}:{{ default "latest" .Values.image.tag }}
+          imagePullPolicy: {{ .Values.global.pullPolicy }}
+          volumeMounts:
+            - name: {{ .Values.volumeMounts.name }}
+              mountPath: {{ .Values.volumeMounts.mountPath }}
+              subPath: {{ .Values.volumeMounts.subPath }}
+              readOnly: {{ .Values.volumeMounts.readOnly }}
+        - name: exporter
+          image: {{ .Values.prometheus_exporter }}
+          args:
+            - -nginx.scrape-uri=http://127.0.0.1:{{ .Values.service.port }}/stub_status
+      volumes:
+        - name: {{ .Values.volumes.name }}
+          configMap:
+            name: {{ .Values.volumes.configMap.name }}
+            items:
+              - key: {{ .Values.volumes.configMap.items.key }}
+                path: {{ .Values.volumes.configMap.items.path }}
+      imagePullSecrets:
+        - name: {{ .Values.global.imagePullSecrets.name }}

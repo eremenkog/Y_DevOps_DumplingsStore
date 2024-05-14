@@ -1,0 +1,26 @@
+stages:
+  - release
+  - deploy
+
+release-to-nexus:
+  stage: release
+  image: alpine/helm:3.9.3
+  before_script:
+    - cd infrastructure/helm
+    - export CHART_VERSION=$(cat Chart.yaml | grep version | head -1 | tr -d version:)
+  script:
+    - helm package --dependency-update .
+    - curl -u $NEXUS_REPO_USER:$NEXUS_REPO_PASS $NEXUS_HELM_REPO/Dumplings_Store/${CHART_VERSION}/Dumplings_Store-${CHART_VERSION} --upload-file *.tgz
+
+deploy-to-kubernetes:
+  stage: deploy
+  image: alpine/helm:3.9.3
+  before_script:
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CA_PEM" > ~/.kube/ca.pem
+    - echo "$KUBE_CONFIG" > ~/.kube/config
+    - apk add jq
+  script:
+    - cd infrastructure/helm
+    - helm upgrade --dependency-update --install --atomic -n nk nk . --set backend.image.tag=$BACKEND_VERSION --set frontend.image.tag=$FRONTEND_VERSION
+    - rm ~/.kube/config
